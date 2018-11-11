@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -226,6 +227,7 @@ if(arg2<=0)
     {
         if(!(placeorderactivityBinding.cash.isChecked() || placeorderactivityBinding.ezzypay.isChecked()))
         {
+
             Toast.makeText(getApplicationContext(),"Please select Payment Option",Toast.LENGTH_SHORT).show();
             return;
         }
@@ -300,7 +302,7 @@ if(arg2<=0)
                             Intent intent=new Intent(PlaceOrderActivity.this,PaymentActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.putExtra("order_id",Object.getString("order_id"));
-                            intent.putExtra("token_id",innerJsonObject1.getString("TokenId"));
+                            intent.putExtra("paymentUrl",innerJsonObject1.getString("paymentUrl"));
                             intent.putExtra("amount",placeorderactivityBinding.payableAmount.getText().toString());
                             startActivity(intent);
                             finish();
@@ -316,6 +318,11 @@ if(arg2<=0)
                             startActivity(intent);
                             finish();
                         }
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), ""+jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -346,6 +353,11 @@ if(arg2<=0)
                 Map<String, String> params = new HashMap<>();
                 params.put("parameters",jsonObject.toString());
                 System.out.println("Parameters"+" "+params);
+                if(!placeorderactivityBinding.cash.isChecked())
+                {
+                    params.put("agent","a");
+
+                }
                 params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+jsonObject.toString()));
                 return params;
             }
@@ -374,6 +386,8 @@ if(arg2<=0)
             e.printStackTrace();
         }
 
+
+
         progressDialog.show();
         progressDialog.setTitle("Please Wait...");
         progressDialog.setCancelable(false);
@@ -391,7 +405,16 @@ if(arg2<=0)
                         placeorderactivityBinding.discountAmount.setText("GHC "+innerObject.getString("discount_amount"));
                         placeorderactivityBinding.commissionAmount.setText("GHC "+innerObject.getString("commission_amount"));
                         try {
-                            placeorderactivityBinding.shippingAmount.setText("GHC " + innerObject.getString("shipping_charge"));
+                            JSONObject orderjObject= jObject.getJSONObject("order");
+                            Iterator<String> keys = orderjObject.keys();
+
+                            while(keys.hasNext()) {
+                                String key = keys.next();
+                                JSONObject innerJObject = orderjObject.getJSONObject(key);
+
+
+                                placeorderactivityBinding.shippingAmount.setText("GHC " + innerJObject.getString("shipping_charges"));
+                            }
                         }catch (Exception e)
                         {
                             placeorderactivityBinding.shippingAmount.setText("GHC 0");

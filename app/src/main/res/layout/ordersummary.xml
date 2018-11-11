@@ -219,7 +219,7 @@ android:id="@+id/shipping"
                     android:layout_height="wrap_content" />
                 <TextView
                     android:layout_width="wrap_content"
-                    android:text="GHC 14.00"
+                    android:text="GHC 0.00"
                     android:layout_marginTop="10dp"
 android:id="@+id/tax"
                     android:layout_height="wrap_content" />

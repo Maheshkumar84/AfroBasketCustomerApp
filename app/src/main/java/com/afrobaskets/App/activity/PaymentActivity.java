@@ -29,7 +29,7 @@ public class PaymentActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 /*postUrl="http://52.35.53.106/gateway/mobile/checkout?token="+getIntent().getStringExtra("token_id")+"&returnurl=http://54.233.182.212/basketapi/application/cron/updatepaymentstatus";*/
-postUrl="https://payments.ezeepaygh.com/mobile/checkout?token="+getIntent().getStringExtra("token_id")+"&returnurl=http://54.233.182.212/basketapi/application/cron/updatepaymentstatus";
+postUrl=getIntent().getStringExtra("paymentUrl");
         webView = (WebView) findViewById(R.id.webView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imgHeader = (ImageView) findViewById(R.id.backdrop);

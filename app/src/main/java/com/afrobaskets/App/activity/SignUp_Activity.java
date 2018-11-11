@@ -11,13 +11,18 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.afrobaskets.App.adapter.CountryCodeAdapter;
+import com.afrobaskets.App.bean.CountryCodeModel;
+import com.afrobaskets.App.bean.SubCategoriesAdapterbean;
 import com.afrobaskets.App.constant.Constants;
 import com.afrobaskets.App.constant.SavePref;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ParseError;
@@ -35,6 +40,7 @@ import com.webistrasoft.org.ecommerce.databinding.SignupActivityBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +51,7 @@ import java.util.regex.Pattern;
  * Created by hh on 08-Nov-17.
  */
 
-public class SignUp_Activity extends AppCompatActivity {
+public class SignUp_Activity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 SignupActivityBinding signupActivityBinding;
 ProgressDialog pDialog;
 JSONObject sendJson;
@@ -55,9 +61,14 @@ JSONObject sendJson;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.signup_activity);
+     //   setContentView(R.layout.signup_activity);
+
+
 
         signupActivityBinding = DataBindingUtil.setContentView(this, R.layout.signup_activity);
+      //  spin = (Spinner) findViewById(R.id.simpleSpinner1);
+        signupActivityBinding.simpleSpinner1.setOnItemSelectedListener(this);
+        setCountryCode();
         signupActivityBinding.btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -102,7 +113,6 @@ JSONObject sendJson;
             }
         });
        mobile=(EditText)findViewById(R.id.txt_mobile);
-        mobile.setFocusable(false);
         signupActivityBinding.txtCity.setFocusable(false);
 
         signupActivityBinding.btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -122,14 +132,14 @@ JSONObject sendJson;
             }
         });
 
-        signupActivityBinding.txtMobile.setOnClickListener(new View.OnClickListener() {
+      /*  signupActivityBinding.txtMobile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(SignUp_Activity.this,CustomerMobileActivity.class);
-                startActivity(intent);
+              *//*  Intent intent=new Intent(SignUp_Activity.this,CustomerMobileActivity.class);
+                startActivity(intent);*//*
 
             }
-        });
+        });*/
 
         if(getIntent().hasExtra("type"))
         {
@@ -187,7 +197,7 @@ JSONObject sendJson;
         String password = signupActivityBinding.password.getText().toString();
         String email = signupActivityBinding.txtEmail.getText().toString();
         String confirm_password = signupActivityBinding.txtPassword.getText().toString();
-        String mobile = signupActivityBinding.txtMobile.getText().toString();
+        final String mobile = signupActivityBinding.txtMobile.getText().toString();
 
         if(!Constants.isNetworkAvailable(this))
         {
@@ -226,12 +236,12 @@ JSONObject sendJson;
             return;
         }*/
 
-        if(password.length()<8 &&!isValidPassword(password)){
+        if(password.length()<8 &&!isValidPassword(password))
+        {
             signupActivityBinding.txtPassword.setError("Password must contains minimum 8 characters at least one Alphabet, one Number and one Special Character");
             signupActivityBinding.txtPassword.setText("");
             signupActivityBinding.password.setText("");
             return;
-
         }
         if (!password.equals(confirm_password)) {
             signupActivityBinding.txtPassword.setError("Password not matched");
@@ -253,8 +263,10 @@ JSONObject sendJson;
             sendJson.put("name", fname);
             sendJson.put("email", email);
             sendJson.put("mobile_number", mobile);
+            sendJson.put("country_code",country_code);
             sendJson.put("id", SavePref.getPref(SignUp_Activity.this,SavePref.User_id));
             sendJson.put("fcm_reg_id",regId);
+
 
         }
 
@@ -281,19 +293,19 @@ JSONObject sendJson;
                                 {
                                   String key = keys.next();
                                     Toast.makeText(getApplicationContext(),"Register  Successfully",Toast.LENGTH_LONG).show();
-                                    //  JSONObject innerJObject = jObject.getJSONObject(key);
                                     JSONObject attributeObject= new JSONObject(Object.getString(key));
-                                 /*   SavePref.saveStringPref(SignUp_Activity.this, SavePref.User_id,attributeObject.getString ("id"));
-                                    SavePref.save_credential(SignUp_Activity.this, SavePref.is_loogedin,"true");
-                                    SavePref.saveStringPref(SignUp_Activity.this, SavePref.Name,attributeObject.getString  ("name"));
-                                    SavePref.save_credential(SignUp_Activity.this, SavePref.Password,signupActivityBinding.password.getText().toString());
-                                    SavePref.save_credential(SignUp_Activity.this, SavePref.Email,attributeObject.getString  ("email"));
-                                    SavePref.saveStringPref(SignUp_Activity.this, SavePref.Mobile,attributeObject.getString  ("mobile_number"));*/
+
                                 }
-                               // Constants.updateCart(SignUp_Activity.this);
-                                Intent intent=new Intent(SignUp_Activity.this, LoginActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                Intent intent=new Intent(SignUp_Activity.this,OtpActivity.class);
+                                intent.putExtra(
+                                        "mobile",mobile);
+                                intent.putExtra(
+                                        "country_code",country_code);
                                 startActivity(intent);
+
+                               /* Intent intent=new Intent(SignUp_Activity.this, LoginActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                startActivity(intent);*/
                                 finish();
                             }
                             else
@@ -339,6 +351,121 @@ JSONObject sendJson;
                 return params;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
+
+    }
+    String country_code;
+
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+        country_code=countryCodeModels.get(position).getCountryCode();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+    }
+    ArrayList<CountryCodeModel> countryCodeModels=new ArrayList<>();
+
+    private void setCountryCode() {
+         /*   if(!Constants.isNetworkAvailable(this))
+        {
+            Snackbar snackbar = Snackbar
+                    .make(loginActivityBinding.btnLogin,getString(R.string.connectio_error), Snackbar.LENGTH_LONG);
+            snackbar.show();
+            Constants.showSnackBar(LoginActivity.this,getString(R.string.connectio_error));
+            return;
+        }*/
+
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();
+        pDialog.setCancelable(false);
+        try {
+            sendJson = new JSONObject();
+            sendJson.put("method", "countryList");
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.BASE_URL+"application/index",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String jsonString="";//your json string here
+                        try{
+                            JSONObject jObjects= new JSONObject(response);
+                            if(jObjects.getString("status").equalsIgnoreCase("success")) {
+                                JSONObject jObject = new JSONObject(response).getJSONObject("data");
+                                Iterator<String> keys = jObject.keys();
+
+                                while (keys.hasNext()) {
+                                    SubCategoriesAdapterbean subCategoriesAdapterbean = new SubCategoriesAdapterbean();
+                                    String key = keys.next();
+                                    JSONObject innerJObject = jObject.getJSONObject(key);
+                                    CountryCodeModel countryCodeModel=new CountryCodeModel();
+                                    countryCodeModel.setCountryCode(innerJObject.getString("country_phone_code"));
+                                    countryCodeModels.add(countryCodeModel);
+                                }
+
+                                CountryCodeAdapter customAdapter=new CountryCodeAdapter(getApplicationContext(),countryCodeModels);
+                                signupActivityBinding.simpleSpinner1.setAdapter(customAdapter);
+                                /*for (int i=0;i<countryCodeModels.size();i++){
+                                    if (countryCodeModels.get(i).getCountryCode().toString().contains("+233")){
+                                        spin.setSelection(i);
+                                    }
+                                }*/
+                            }
+                            else
+                            {
+
+                                Constants.showSnackBar(SignUp_Activity.this,"Server  Error");
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        pDialog.dismiss();
+                    }
+
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                    Constants.showSnackBar(SignUp_Activity.this,"Communication Error!");
+                } else if (error instanceof AuthFailureError) {
+                    Constants.showSnackBar(SignUp_Activity.this, "Authentication Error!");
+                } else if (error instanceof ServerError) {
+                    Constants.showSnackBar(SignUp_Activity.this,"Server Side Error!");
+                } else if (error instanceof NetworkError) {
+                    Constants.showSnackBar(SignUp_Activity.this, "Network Error!");
+                } else if (error instanceof ParseError) {
+                    Constants.showSnackBar(SignUp_Activity.this,"Parse Error!");
+                }
+
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String,String>();
+                params.put("parameters",sendJson.toString());
+                params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+sendJson.toString()));
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+
     }
    }

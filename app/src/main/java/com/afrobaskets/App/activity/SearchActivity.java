@@ -61,7 +61,7 @@ public class SearchActivity extends AppCompatActivity implements CartCallback{
     TextView cart_count;
     LinearLayoutManager linearLayoutManager;
     SearchView search;
-    int pageCount=1;
+    int pageCount=0;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     ProgressBar mprogressBar,bottomProgress;
     String searchText;
@@ -127,11 +127,11 @@ public class SearchActivity extends AppCompatActivity implements CartCallback{
                 searchText=newText;
                 if (newText.length() > 2) {
                     mprogressBar.setVisibility(View.VISIBLE);
-                    if(pageCount==1 && newText.length()>3)
+                    /*if(pageCount==1 && newText.length()>3)
                     {
-                        getProducts(++pageCount,searchText);
+                        getProducts(pageCount,searchText);
                       return false;
-                    }
+                    }*/
 pageCount=1;
                     subCategoriesAdapterbeanArrayList.clear();
 
@@ -183,9 +183,7 @@ pageCount=1;
         try {
             sendJson = new JSONObject();
             sendJson.put("method", "productlist");
-
-                sendJson.put("category_name", textsearch);
-
+            sendJson.put("category_name", textsearch);
             sendJson.put("product_name", textsearch);
             sendJson.put("pagination","1");
             sendJson.put("page",pageCount);
@@ -221,7 +219,7 @@ pageCount=1;
                             {
                                 subCategoriesAdapterbeanArrayList.clear();
                             }
-                            while(keys.hasNext())
+                                                        while(keys.hasNext())
                             {
                                 SubCategoriesAdapterbean subCategoriesAdapterbean=new SubCategoriesAdapterbean();
                                 String key = keys.next();
@@ -394,9 +392,7 @@ if(subCategoriesAdapterbeanArrayList.size()<=0) {
             }
         };
 
-
         queue.add(stringRequest);
-
     }
 
     private void startVoiceInput() {

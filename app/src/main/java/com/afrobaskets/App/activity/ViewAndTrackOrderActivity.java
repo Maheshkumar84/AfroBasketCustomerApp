@@ -125,7 +125,7 @@ ProgressDialog pDialog;
                                     viewAndTrackOrderBeans.setCommission_amount(order_detailsJObject.getString("commission_amount"));
                                 try
                                 {
-                                    viewAndTrackOrderBeans.setShipping_charge(order_detailsJObject.getString("shipping_charge"));
+                                    viewAndTrackOrderBeans.setShipping_charge(order_detailsJObject.getString("shipping_charges"));
                                 }catch (Exception e)
                                 {
                                     viewAndTrackOrderBeans.setShipping_charge("0");

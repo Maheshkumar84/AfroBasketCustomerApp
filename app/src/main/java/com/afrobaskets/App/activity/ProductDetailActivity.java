@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import com.afrobaskets.App.adapter.ProductDetailPagerAdapter;
 import com.afrobaskets.App.bean.CartListBean;
 import com.afrobaskets.App.bean.SubCategoriesAdapterbean;
@@ -58,7 +59,7 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
     protected void onResume() {
         super.onResume();
         cart_count.setText(""+Constants.cartListBeenArray.size());
-        try {
+        /*try {
             for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
                 if (subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
                     productdetailactivityBinding.itemCount.setText(Constants.cartListBeenArray.get(i).getNumber_of_item());
@@ -69,7 +70,7 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
               }
 
@@ -142,8 +143,35 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
                 .into(product_image);
         //hashMap = (LinkedHashMap<Strng, String>) getIntent().getSerializableExtra("map");
         setUpTabs();
+
+
+
         setVarients(productdetailactivityBinding.varientSpinner, position);
         productdetailactivityBinding.varientSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                       int arg2, long arg3) {
+                productdetailactivityBinding.buttonAdd.setVisibility(View.VISIBLE);
+                productdetailactivityBinding.button.setVisibility(View.GONE);
+                for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+
+                    if (subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getMerchant_inventry_id())) {
+                        productdetailactivityBinding.itemCount.setText(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                        productdetailactivityBinding.buttonAdd.setVisibility(View.GONE);
+                        productdetailactivityBinding.button.setVisibility(View.VISIBLE);
+                    }
+
+                }
+                // TODO Auto-generated method stub
+                productdetailactivityBinding.price.setText("GHC " + subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getPrice());
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+       /* productdetailactivityBinding.varientSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1,
@@ -157,23 +185,52 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
                 // TODO Auto-generated method stub.3
 
             }
-        });
+        });*/
 
         productdetailactivityBinding.buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 productdetailactivityBinding.buttonAdd.setVisibility(View.GONE);
                 productdetailactivityBinding.button.setVisibility(View.VISIBLE);
-                int count = Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString());
-                if (count < 0) {
-                    return;
+                productdetailactivityBinding.itemCount.setText("1");
+
+                Constants.updateCart(ProductDetailActivity.this,"add", subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get( productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId(), subCategoriesAdapterbeanList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
+            }
+        });
+        productdetailactivityBinding.buttonPluse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count=0;
+                for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                    if (subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                        count=Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                    }
                 }
-                Constants.updateCart(ProductDetailActivity.this,"add", subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId(), subCategoriesAdapterbeanList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
-                productdetailactivityBinding.itemCount.setText("" + (Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString()) + 1));
+                Constants.updateCart(ProductDetailActivity.this,"add",subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId() ,subCategoriesAdapterbeanList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
+                productdetailactivityBinding.itemCount.setText(""+(count+1));
+            }
+        });
+        productdetailactivityBinding.buttonMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count=0;
+                for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                    if (subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                        count=Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                    }
+                }
+                if(count<=1)
+                {   productdetailactivityBinding.buttonAdd.setVisibility(View.VISIBLE);
+                    productdetailactivityBinding.button.setVisibility(View.GONE);
+                }
+                Constants.updateCart(ProductDetailActivity.this,"delete",subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(productdetailactivityBinding.varientSpinner.getSelectedItemPosition()).getId(),subCategoriesAdapterbeanList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
+                productdetailactivityBinding.itemCount.setText(""+(count-1));
             }
         });
 
-        productdetailactivityBinding.buttonPluse.setOnClickListener(new View.OnClickListener() {
+
+
+     /*   productdetailactivityBinding.buttonPluse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int count = Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString());
@@ -183,8 +240,8 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
                 Constants.updateCart(ProductDetailActivity.this,"add", subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId(), subCategoriesAdapterbeanList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
                 productdetailactivityBinding.itemCount.setText("" + (Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString()) + 1));
             }
-        });
-        productdetailactivityBinding.buttonMinus.setOnClickListener(new View.OnClickListener() {
+        });*/
+       /* productdetailactivityBinding.buttonMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int count = Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString());
@@ -202,7 +259,7 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
 
                 productdetailactivityBinding.itemCount.setText("" + (Integer.parseInt(productdetailactivityBinding.itemCount.getText().toString()) - 1));
             }
-        });
+        });*/
     }
 
     void setVarients(Spinner spinner, int position) {
@@ -215,8 +272,6 @@ public class ProductDetailActivity extends AppCompatActivity implements CartCall
                     + " " + subCategoriesAdapterbeanList.get(position)
                     .getSubCategoriesAdapterAttributesBeanArrayList().get(i).getUnit());
         }
-
-
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

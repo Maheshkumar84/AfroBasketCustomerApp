@@ -39,6 +39,7 @@ public class OfferAndHotDealViewAllAcivityAdapter extends RecyclerView.Adapter<O
      private  ProgressDialog pDialog;
     JSONObject sendJson;
     String url;
+    String type;
     private List<String> itemsData;
     ArrayList<SubCategoriesAdapterbean> subCategoriesAdapterbeanArrayList;
     Context context;
@@ -48,6 +49,7 @@ public class OfferAndHotDealViewAllAcivityAdapter extends RecyclerView.Adapter<O
         Button button_minus,button_pluse,button_add;
         Spinner item_spinner;
         LinearLayout btn_linear1;
+
 
         public MyViewHolder(View view) {
             super(view);
@@ -68,9 +70,10 @@ public class OfferAndHotDealViewAllAcivityAdapter extends RecyclerView.Adapter<O
         }
 
     }
-    public OfferAndHotDealViewAllAcivityAdapter(Context context, ArrayList<SubCategoriesAdapterbean> subCategoriesAdapterbeanArrayList) {
+    public OfferAndHotDealViewAllAcivityAdapter(Context context, ArrayList<SubCategoriesAdapterbean> subCategoriesAdapterbeanArrayList,String type) {
         this.subCategoriesAdapterbeanArrayList = subCategoriesAdapterbeanArrayList;
         this.context=context;
+        this.type=type;
     }
 
     @Override
@@ -85,6 +88,15 @@ public class OfferAndHotDealViewAllAcivityAdapter extends RecyclerView.Adapter<O
         viewHolder.txt_price.setText("GHC "+subCategoriesAdapterbeanArrayList.get(position).
                 getSubCategoriesAdapterAttributesBeanArrayList().get(0).getPrice());
         viewHolder.txt_price.setText("GHC "+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getPrice());
+     /*   if(type.equalsIgnoreCase("new_offer"))
+        {
+            viewHolder.txt_offers.setVisibility(View.GONE);
+            viewHolder.txt_price.setVisibility(View.GONE);
+        }
+        else {*/
+            viewHolder.txt_offers.setVisibility(View.GONE);
+            viewHolder.txt_price.setVisibility(View.GONE);
+      //  }
         viewHolder.item_count.setText("0");
         Float off_price=0.0f;
         try {

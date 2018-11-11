@@ -88,7 +88,7 @@ int pageCount=1;
         });
 
 
-        adapter = new OfferAndHotDealViewAllAcivityAdapter(OfferAndHotDealViewAllActivity.this,subCategoriesAdapterbeanArrayList);
+        adapter = new OfferAndHotDealViewAllAcivityAdapter(OfferAndHotDealViewAllActivity.this,subCategoriesAdapterbeanArrayList,getIntent().getStringExtra("type"));
         final GridLayoutManager layoutManager1
                 = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager1);

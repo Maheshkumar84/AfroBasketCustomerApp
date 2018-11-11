@@ -76,6 +76,9 @@
          <activity android:name="com.afrobaskets.App.activity.ForgetPassword"
              android:windowSoftInputMode="adjustPan"
              android:screenOrientation="portrait"/>
+         <activity android:name="com.afrobaskets.App.activity.TermAndConditionActivity"
+             android:windowSoftInputMode="adjustPan"
+             android:screenOrientation="portrait"/>
          <activity android:name="com.afrobaskets.App.activity.ProductDetailActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"/>

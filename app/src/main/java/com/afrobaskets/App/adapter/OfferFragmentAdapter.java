@@ -35,7 +35,7 @@ import java.util.List;
  * Created by HP-PC on 11/17/2017.
  */
 
-public class HotDealFragmentAdapter extends RecyclerView.Adapter<HotDealFragmentAdapter.MyViewHolder> {
+public class OfferFragmentAdapter extends RecyclerView.Adapter<OfferFragmentAdapter.MyViewHolder> {
      private  ProgressDialog pDialog;
     JSONObject sendJson;
     String url;
@@ -68,7 +68,7 @@ public class HotDealFragmentAdapter extends RecyclerView.Adapter<HotDealFragment
         }
 
     }
-    public HotDealFragmentAdapter(Context context,ArrayList<SubCategoriesAdapterbean> subCategoriesAdapterbeanArrayList) {
+    public OfferFragmentAdapter(Context context, ArrayList<SubCategoriesAdapterbean> subCategoriesAdapterbeanArrayList) {
         this.subCategoriesAdapterbeanArrayList = subCategoriesAdapterbeanArrayList;
         this.context=context;
     }
@@ -77,14 +77,14 @@ void back()
 
 }
     @Override
-    public HotDealFragmentAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public OfferFragmentAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.offerandhotdealfragmentadapter, parent, false);
-        return new HotDealFragmentAdapter.MyViewHolder(itemView);
+        return new OfferFragmentAdapter.MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final HotDealFragmentAdapter.MyViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final OfferFragmentAdapter.MyViewHolder viewHolder, final int position) {
         viewHolder.item_count.setText("0");
 
         /*viewHolder.txt_price.setText("GHC "+subCategoriesAdapterbeanArrayList.get(position).
@@ -157,7 +157,7 @@ else {
                 {
                     e.printStackTrace();
                 }
-
+                viewHolder.txt_offers.setVisibility(View.GONE);
                 if(subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(arg2).getDiscount_type().equalsIgnoreCase("percent"))
                 {
                     viewHolder.txt_offers.setText(subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(arg2).getDiscount_value()+" % Off");
@@ -166,7 +166,7 @@ else {
                 {
                     viewHolder.txt_offers.setText(("CHG "+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(arg2).getDiscount_value())+" Off");
                 }
-
+                viewHolder.txt_price.setVisibility(View.GONE);
                 viewHolder.txt_offprice.setText("GHC "+String.valueOf(off_price));
                 if(!subCategoriesAdapterbeanArrayList.get(position).getBrand_name().isEmpty()) {
                     viewHolder.txt_p_name.setText(subCategoriesAdapterbeanArrayList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanArrayList.get(position).getBrand_name() + ")");

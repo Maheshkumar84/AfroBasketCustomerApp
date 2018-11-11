@@ -135,6 +135,8 @@ public class Address_Activity extends AppCompatActivity
                     jsonObject.put("method","addeditdeliveryaddress");
                     jsonObject.put("contact_name",txt_name.getText().toString());
                     jsonObject.put("city_id", SavePref.get_credential(Address_Activity.this,SavePref.city_id));
+                    jsonObject.put("lat", SavePref.get_credential(Address_Activity.this,SavePref.current_lat));
+                    jsonObject.put("long", SavePref.get_credential(Address_Activity.this,SavePref.current_lon));
                     jsonObject.put("city_name",txt_city_name.getText().toString());
                     jsonObject.put("house_number",txt_house_number.getText().toString());
                     jsonObject.put("area","");

@@ -87,9 +87,9 @@ ProgressDialog progressDialog;
         }
         order_id=viewAndTrackOrderBeansList.get(position).getOrder_id();
         ordersummaryBinding.shipping.setText("GHC "+viewAndTrackOrderBeansList.get(position).getShipping_charge());
-        ordersummaryBinding.tax.setText("GHC "+viewAndTrackOrderBeansList.get(position).getTax_amount());
-        ordersummaryBinding.otherTotal.setText("GHC "+Integer.parseInt(viewAndTrackOrderBeansList.get(position)
-        .getPayable_amount()));
+       // ordersummaryBinding.tax.setText("GHC "+viewAndTrackOrderBeansList.get(position).getTax_amount());
+        ordersummaryBinding.otherTotal.setText("GHC "+viewAndTrackOrderBeansList.get(position)
+        .getPayable_amount());
         ordersummaryBinding.promo.setText("GHC "+viewAndTrackOrderBeansList.get(position).getDiscount_amount());
         fAdapter = new OrderSummaryAdapter(OrderSummeryActivity.this, viewAndTrackOrderBeansList.get(position).getViewAndTrackItemOrderBeanArrayList(),viewAndTrackOrderBeansList.get(position).getImageRootPath());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());

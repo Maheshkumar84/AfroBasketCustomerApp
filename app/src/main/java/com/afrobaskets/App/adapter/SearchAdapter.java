@@ -60,6 +60,9 @@ Context context;
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         try {
+            viewHolder.btn_linear1.setVisibility(View.GONE);
+            viewHolder.button_add.setVisibility(View.VISIBLE);
+
             viewHolder.price.setText("GHC " + subCategoriesAdapterbeanArrayList.get(position).
                     getSubCategoriesAdapterAttributesBeanArrayList().get(0).getPrice());
             if (!subCategoriesAdapterbeanArrayList.get(position).getBrand_name().isEmpty()) {
@@ -79,7 +82,7 @@ Context context;
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(viewHolder.product_image);
             setVarients(viewHolder.item_spinner, position);
-            viewHolder.item_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+           /* viewHolder.item_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
                 @Override
                 public void onItemSelected(AdapterView<?> arg0, View arg1,
@@ -93,8 +96,72 @@ Context context;
                     // TODO Auto-generated method stub
 
                 }
+            });*/
+            viewHolder.item_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                           int arg2, long arg3) {
+                    viewHolder.btn_linear1.setVisibility(View.GONE);
+                    viewHolder.button_add.setVisibility(View.VISIBLE);
+                    for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+
+                        if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getMerchant_inventry_id())) {
+                            viewHolder.item_count.setText(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                            viewHolder.btn_linear1.setVisibility(View.VISIBLE);
+                            viewHolder.button_add.setVisibility(View.GONE);
+                        }
+
+                    }
+                    // TODO Auto-generated method stub
+                    viewHolder.price.setText("GHC " + subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getPrice());
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
+            viewHolder.button_add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewHolder.btn_linear1.setVisibility(View.VISIBLE);
+                    viewHolder.button_add.setVisibility(View.GONE);
+                    viewHolder.item_count.setText("1");
+                    Constants.updateCart(context, "add", subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId(), subCategoriesAdapterbeanArrayList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
+                }
             });
 
+            viewHolder.button_plus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int count = 0;
+                    for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                        if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                            count = Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                        }
+                    }
+                    Constants.updateCart(context, "add", subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId(), subCategoriesAdapterbeanArrayList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
+                    viewHolder.item_count.setText("" + (count + 1));
+                }
+            });
+            viewHolder.button_minus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int count = 0;
+                    for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                        if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                            count = Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                        }
+                    }
+                    if (count <= 1) {
+                        viewHolder.btn_linear1.setVisibility(View.GONE);
+                        viewHolder.button_add.setVisibility(View.VISIBLE);
+                    }
+                    Constants.updateCart(context, "delete", subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId(), subCategoriesAdapterbeanArrayList.get(position).getProduct_name() + "(" + subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name() + ")");
+                    viewHolder.item_count.setText("" + (count - 1));
+                }
+            });
             viewHolder.product_image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -111,7 +178,7 @@ Context context;
                 }
             });
 
-            viewHolder.button_plus.setOnClickListener(new View.OnClickListener() {
+           /* viewHolder.button_plus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int count = Integer.parseInt(viewHolder.item_count.getText().toString());
@@ -161,9 +228,10 @@ Context context;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 

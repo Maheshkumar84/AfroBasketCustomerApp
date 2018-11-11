@@ -20,6 +20,16 @@ public class AppController extends Application {
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
 
+     String customerMobile;
+    public String getCustomerNumer() {
+        return customerMobile;
+    }
+
+    public void setCustomerNumer(String customerMobile)
+    {
+        this.customerMobile = customerMobile;
+    }
+
     private static AppController mInstance;
 
     @Override

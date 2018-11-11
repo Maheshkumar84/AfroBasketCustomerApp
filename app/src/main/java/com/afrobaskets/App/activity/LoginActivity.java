@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
+
 import com.afrobaskets.App.constant.Constants;
 import com.afrobaskets.App.constant.SavePref;
 import com.android.volley.AuthFailureError;
@@ -110,6 +112,36 @@ LoginActivityBinding loginActivityBinding;
         }
     }
 
+    JSONObject innerJObjects;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            if (resultCode == 1) {
+                SavePref.saveStringPref(LoginActivity.this, SavePref.User_id, innerJObjects.getString("id"));
+                SavePref.save_credential(LoginActivity.this, SavePref.is_loogedin, "true");
+                SavePref.saveStringPref(LoginActivity.this, SavePref.Name, innerJObjects.getString("name"));
+                SavePref.save_credential(LoginActivity.this, SavePref.Password, loginActivityBinding.txtPassword.getText().toString());
+                SavePref.save_credential(LoginActivity.this, SavePref.Email, innerJObjects.getString("email"));
+                SavePref.saveStringPref(LoginActivity.this, SavePref.Mobile, innerJObjects.getString("mobile_number"));
+
+                Constants.updateCart(LoginActivity.this);
+                if (getIntent().hasExtra("type"))
+
+                {
+                    Intent intent = new Intent(LoginActivity.this, CategoriesActivity.class);
+                    startActivity(intent);
+                }
+                finish();
+            }
+
+        } catch (Exception ex) {
+            Toast.makeText(LoginActivity.this, ex.toString(),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }
     private void login ()
     {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
@@ -172,6 +204,18 @@ LoginActivityBinding loginActivityBinding;
                                     String key = keys.next();
                                   //  JSONObject innerJObject = jObject.getJSONObject(key);
                                     JSONObject attributeObject= new JSONObject(Object.getString(key));
+                                    if(attributeObject.getString("verified_mobile").equalsIgnoreCase("0"))
+                                    {
+                                        Intent intent=new Intent(LoginActivity.this,OtpActivity.class);
+                                        intent.putExtra(                                                  "mobile",attributeObject.getString("mobile_number"));
+                                             intent.putExtra(
+                                                "country_code","+233");
+                                        startActivityForResult(intent,1);
+                                        innerJObjects=attributeObject;
+                                        pDialog.dismiss();
+                                        return;
+                                    }
+
              SavePref.saveStringPref(LoginActivity.this, SavePref.User_id,attributeObject.getString ("id"));
              SavePref.save_credential(LoginActivity.this, SavePref.is_loogedin,"true");
              SavePref.saveStringPref(LoginActivity.this, SavePref.Name,attributeObject.getString  ("name"));

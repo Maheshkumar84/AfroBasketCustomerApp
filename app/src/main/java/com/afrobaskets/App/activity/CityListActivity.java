@@ -193,7 +193,15 @@ current_location=(Button)findViewById(R.id.btn_location);
 current_location.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        Toast.makeText(getApplicationContext(),"Service Not Available",Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getApplicationContext(),"Service Not Available",Toast.LENGTH_SHORT).show();
+     //   updateCityAndPincode(,);
+        if(txt_location.getText().toString().length()>3) {
+            getCity(txt_location.getText().toString(), String.valueOf(mCurrentLocation.getLatitude()), String.valueOf(mCurrentLocation.getLongitude()));
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"Please wait for location update.", Toast.LENGTH_SHORT).show();
+        }
     }
 });
         search_location.setOnClickListener(new View.OnClickListener() {
@@ -218,9 +226,9 @@ current_location.setOnClickListener(new View.OnClickListener() {
 
                         try {
 
-                            String cityName=getCityNameByCoordinates(place.getLatLng().latitude,place.getLatLng().longitude);
-                            getCity(cityName,String.valueOf(place.getLatLng().latitude),String.valueOf(place.getLatLng().longitude));
-                        } catch (IOException e) {
+                          //  String cityName=getCityNameByCoordinates(place.getLatLng().latitude,place.getLatLng().longitude);
+                            getCity(place.getAddress().toString(),String.valueOf(place.getLatLng().latitude),String.valueOf(place.getLatLng().longitude));
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -260,15 +268,18 @@ current_location.setOnClickListener(new View.OnClickListener() {
 
     }
     String subLocality="";
+
     private String getCityNameByCoordinates(double lat, double lon) throws IOException {
         Geocoder mGeocoder = new Geocoder(this, Locale.getDefault());
 
+/*
         List<Address> addresses = mGeocoder.getFromLocation(lat, lon, 1);
-        if (addresses != null && addresses.size() > 0) {
-            String content = "";
-            subLocality = addresses.get(0).getAddressLine(0);
+*/
+       // if (addresses != null && addresses.size() > 0) {
+         //   String content = "";
+           /* subLocality = addresses.get(0).getAddressLine(5);
 
-           /* if( !TextUtils.isEmpty( addresses.get(0).getFeatureName() ) )
+           *//* if( !TextUtils.isEmpty( addresses.get(0).getFeatureName() ) )
             {
                 subLocality=subLocality+addresses.get(0).getFeatureName()+",";
             }
@@ -278,11 +289,29 @@ current_location.setOnClickListener(new View.OnClickListener() {
             }
             if( !TextUtils.isEmpty( addresses.get(0).getSubLocality() ) ) {
                 subLocality=subLocality+addresses.get(0).getSubLocality();
-            }*/
+            }*//*
 
             return addresses.get(0).getLocality();
-        }
-        return null;
+        }*/
+
+            try {
+                List<Address> addresses = mGeocoder.getFromLocation(lat, lon, 1);
+                if (addresses != null && addresses.size() > 0) {
+                    for (Address adr : addresses) {
+                        if (adr.getSubLocality() != null && adr.getLocality().length() > 0) {
+                            subLocality = addresses.get(0).getAddressLine(0);
+                            return addresses.get(0).getLocality();
+
+                        }
+                    }
+                }
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+
+            return null;
     }
     //step 1
     protected synchronized void buildGoogleApiClient()
@@ -296,7 +325,7 @@ current_location.setOnClickListener(new View.OnClickListener() {
     }
 ProgressDialog pDialog;
     JSONObject manJson;
-    private void getCity(String city, final String lat, final String lan)
+    private void getCity(final String city, final String lat, final String lan)
     {
         pDialog = new ProgressDialog(CityListActivity.this);
         pDialog.setMessage("Loading...");
@@ -307,6 +336,7 @@ ProgressDialog pDialog;
             manJson.put("method", "getCityIdByAddressOrLatLng");
             manJson.put("address", city);
             manJson.put("lat", lat);
+
             manJson.put("lng", lan);
 
         }catch (Exception e)
@@ -326,7 +356,7 @@ ProgressDialog pDialog;
                                 if (Object.getString("status").equalsIgnoreCase("success")) {
                                     JSONObject jObject = new JSONObject(response).getJSONObject("data");
                                     SavePref.save_credential(CityListActivity.this, SavePref.current_lat, String.valueOf(lat));
-                                    SavePref.save_credential(CityListActivity.this, SavePref.city_locality, subLocality);
+                                    SavePref.save_credential(CityListActivity.this, SavePref.city_locality, city);
 
 
                                     SavePref.save_credential(CityListActivity.this, SavePref.is_City_Selected, "true");
@@ -387,8 +417,6 @@ ProgressDialog pDialog;
                 Map<String, String> params = new HashMap<String,String>();
                 params.put("parameters",manJson.toString());
                 params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+manJson.toString()));
-
-
                 return params;
             }
         };
@@ -655,7 +683,29 @@ ProgressDialog pDialog;
 
     private void updateCityAndPincode(double latitude, double longitude)
     {
-        try
+
+        Geocoder geocoder = new Geocoder(CityListActivity.this);
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 10);
+            if (addresses != null && addresses.size() > 0) {
+                for (Address adr : addresses) {
+                    if (adr.getSubLocality() != null && adr.getLocality().length() > 0) {
+                        //subLocality = addresses.get(0).getAddressLine(0);
+                       // mLocationAddress.setText(addresses.get(0).getAddressLine(0));
+                        txt_location.setText(addresses.get(0).getAddressLine(0));
+                       // return addresses.get(0).getLocality();
+
+                    }
+                }
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+      //  return null;
+    }
+       /* try
         {
             Geocoder gcd = new Geocoder(this, Locale.getDefault());
             List<Address> addresses = gcd.getFromLocation(latitude, longitude, 1);
@@ -671,9 +721,9 @@ ProgressDialog pDialog;
         catch (Exception e)
         {
             Log.e(TAG,"exception:"+e.toString());
-        }
+        }*/
 
-    }
+
 
 
     void Dialogs(final JSONObject jsonObject, final String lat, String lon)

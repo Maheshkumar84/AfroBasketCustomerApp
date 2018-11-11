@@ -42,6 +42,7 @@ import com.afrobaskets.App.bean.CartListBean;
 import com.afrobaskets.App.bean.CategoriesBean;
 import com.afrobaskets.App.bean.ExpandedMenuModel;
 import com.afrobaskets.App.bean.TimeSlotsBean;
+import com.afrobaskets.App.constant.AppController;
 import com.afrobaskets.App.constant.Constants;
 import com.afrobaskets.App.constant.SavePref;
 import com.afrobaskets.App.fragments.MerchantsFragments;
@@ -49,6 +50,7 @@ import com.afrobaskets.App.fragments.OffersAndHotDealFragment;
 import com.afrobaskets.App.fragments.ShopByCategoriesFragments;
 import com.afrobaskets.App.interfaces.CartCallback;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ParseError;
@@ -228,10 +230,10 @@ if(key.equalsIgnoreCase(res[0]))
         item5.setIconName("Share");
         item5.setIconImg(android.R.drawable.ic_delete);
         listDataHeader.add(item5);
-        ExpandedMenuModel item6 = new ExpandedMenuModel();
+        /*ExpandedMenuModel item6 = new ExpandedMenuModel();
         item6.setIconName("Help");
         item6.setIconImg(android.R.drawable.ic_delete);
-        listDataHeader.add(item6);
+        listDataHeader.add(item6);*/
         ExpandedMenuModel item7 = new ExpandedMenuModel();
         item7.setIconName("Rate us");
         item7.setIconImg(android.R.drawable.ic_delete);
@@ -511,23 +513,27 @@ if(key.equalsIgnoreCase(res[0]))
 
                     Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                     sharingIntent.setType("text/plain");
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.ahoy.ureward");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.afrobaskets");
                     sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject");
                     startActivity(Intent.createChooser(sharingIntent, "Share using"));
                 }
-                if (i == 4) {
+               /* if (i == 4) {
                     mDrawerLayout.closeDrawers();
                     startActivity(new Intent(CategoriesActivity.this, HelpActivity.class));
-                }
-                if (i == 5) {
+                }*/
+                if (i ==4) {
                     mDrawerLayout.closeDrawers();
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri
-                    .parse("market://details?id=com.ahoy.ureward")));
+                    .parse("https://play.google.com/store/apps/details?id=com.afrobaskets")));
                 }
-                if (i == 6) {
+                if (i ==5) {
                     mDrawerLayout.closeDrawers();
+                    startActivity(new Intent(CategoriesActivity.this, TermAndConditionActivity.class));
                 }
-                if (i == 7) {
+               /* if (i == 6) {
+                    mDrawerLayout.closeDrawers();
+                }*/
+                if (i == 6) {
                     mDrawerLayout.closeDrawers();
                     onCall();
                 }
@@ -594,7 +600,7 @@ if(key.equalsIgnoreCase(res[0]))
         pDialog.show();
         pDialog.setCancelable(false);
         setup();
-
+        getPhoneNumberApi();
     }
 
     TextView cart_count;
@@ -705,7 +711,102 @@ if(key.equalsIgnoreCase(res[0]))
         };
         queue.add(stringRequest);
     }
+    ArrayList<String>customerNumber=new ArrayList<>();
+/*
+    void ShowDialogMobileNumber()
+    {
+        final CharSequence[] choice =new CharSequence[((AppController)getApplication()).getCustomerNumer().size()];
+        for(int i=0;i<((AppController)getApplication()).getCustomerNumer().size();i++)
+        {
+            choice[i] =(((AppController)getApplication()).getCustomerNumer().get(i));
+        }
 
+        int from; //This must be declared as global !
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Select PhoneNumber");
+        alert.setSingleChoiceItems(choice, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+               ;
+                startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse( ((AppController)getApplication()).getCustomerNumer())));
+            }
+        });
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alert.show();
+    }*/
+JSONObject mobileSendJsons;
+    private void getPhoneNumberApi()
+    {
+
+
+        try
+        {
+            mobileSendJsons = new JSONObject();
+            mobileSendJsons.put("method", "customercarenumber");
+            mobileSendJsons.put("city_id", SavePref.getPref(this,SavePref.city_id));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.BASE_URL+"application/customer?",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try
+                        {
+                            JSONObject jObject = null;
+                            jObject = new JSONObject(response);
+                          //  {"status":"success","customer_care_number":"+2333553251740"}
+                            if (jObject.getString("status").equalsIgnoreCase("success"))
+                            {
+
+
+                                ((AppController)getApplication()).setCustomerNumer(jObject.getString("customer_care_number"));
+
+                            } else {
+
+                            }
+                        }catch (Exception e)
+                        {
+
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+
+
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String,String>();
+                params.put("parameters",mobileSendJsons.toString());
+                params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+mobileSendJsons.toString()));
+
+                return params;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(stringRequest);
+    }
     public void onCall() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
 
@@ -715,8 +816,9 @@ if(key.equalsIgnoreCase(res[0]))
                     new String[]{Manifest.permission.CALL_PHONE},
                     123);
         } else {
-            startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:12345678901")));
-        }
+            startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:"+(((AppController)getApplication()).getCustomerNumer()))));
+
+                }
     }
 
     @Override

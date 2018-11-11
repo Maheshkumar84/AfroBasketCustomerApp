@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.afrobaskets.App.activity.OfferAndHotDealViewAllActivity;
 import com.afrobaskets.App.adapter.HotDealFragmentAdapter;
+import com.afrobaskets.App.adapter.OfferFragmentAdapter;
 import com.afrobaskets.App.bean.CategoriesBean;
 import com.afrobaskets.App.bean.SubCategoriesAdapterAttributesBean;
 import com.afrobaskets.App.bean.SubCategoriesAdapterbean;
@@ -57,7 +58,7 @@ public class OffersAndHotDealFragment extends android.support.v4.app.Fragment {
     ArrayList<SubCategoriesAdapterbean>HotDealArrayList=new ArrayList<>();
     ArrayList<SubCategoriesAdapterbean>OfferArrayList=new ArrayList<>();
     HotDealFragmentAdapter hotDealFragmentAdapter;
-    HotDealFragmentAdapter offerFragmentAdapter;
+    OfferFragmentAdapter offerFragmentAdapter;
     public OffersAndHotDealFragment() {
         // Required empty public constructor
     }
@@ -90,13 +91,13 @@ hot_deal_View.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(getActivity(), OfferAndHotDealViewAllActivity.class);
-                intent.putExtra("type","new_offer");
+                intent.putExtra("type","new_arrival");
                 startActivity(intent);
 
             }
         });
         hotDealFragmentAdapter = new HotDealFragmentAdapter(getActivity(),HotDealArrayList);
-        offerFragmentAdapter = new HotDealFragmentAdapter(getActivity(),OfferArrayList);
+        offerFragmentAdapter = new OfferFragmentAdapter(getActivity(),OfferArrayList);
         final LinearLayoutManager layoutManager1
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         hot_deal_recyclerView.setLayoutManager(layoutManager1);
@@ -343,7 +344,7 @@ try{
         try {
             sendJsonObjects = new JSONObject();
             sendJsonObjects.put("method", "productlist");
-            sendJsonObjects.put("product_type", "new_offer");
+            sendJsonObjects.put("product_type", "new_arrival");
             sendJsonObjects.put("city_id", SavePref.get_credential(getActivity(),SavePref.city_id));
             sendJsonObjects.put("pagination","1");
             sendJsonObjects.put("page",pageCount);
@@ -509,7 +510,7 @@ catch (Exception e)
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String,String>();
                 params.put("parameters",sendJsonObjects.toString());
-                params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+sendJson.toString()));
+                params.put("rqid",Constants.get_SHA_512_SecurePassword(Constants.salt+sendJsonObjects.toString()));
 
                 return params;
             }

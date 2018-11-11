@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.afrobaskets.App.constant.Constants;
 import com.afrobaskets.App.constant.SavePref;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ParseError;
@@ -61,11 +62,13 @@ public class OtpActivity extends AppCompatActivity {
          toolbar_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent=new Intent();
+                setResult(0,intent);
                 finish();
             }
         });
         TextView textView=(TextView)findViewById(R.id.mobile_show);
-        textView.setText("Otp sent on your mobile "+getIntent().getStringExtra("mobile"));
+        textView.setText("Otp sent on your mobile "+getIntent().getStringExtra("mobile")+" and to your registered email id.");
        // checkAndRequestPermissions();
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +166,10 @@ getOtp();
                 return params;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
     }
     private  boolean checkAndRequestPermissions() {
@@ -219,6 +226,14 @@ edt_otp.setText(message);
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent();
+        setResult(0,intent);
+        finish();
+    }
+
     private void getOtp (){
 
      /*   if(!Constants.isNetworkAvailable(this))
@@ -236,8 +251,8 @@ edt_otp.setText(message);
         try {
             sendJson = new JSONObject();
             sendJson.put("method", "verifyotp");
-           // sendJson.put("country_code",getIntent().getStringExtra("country_code"));
-            sendJson.put("mobile_number",getIntent().getStringExtra("country_code")+getIntent().getStringExtra("mobile"));
+           sendJson.put("country_code",getIntent().getStringExtra("country_code"));
+            sendJson.put("mobile_number",getIntent().getStringExtra("mobile"));
             sendJson.put("otp_type","register");
             sendJson.put("otp",edt_otp.getText().toString());
         }catch (Exception e)
@@ -254,9 +269,9 @@ edt_otp.setText(message);
                             JSONObject jObject= new JSONObject(response);
                             if(jObject.getString("status").equalsIgnoreCase("success"))
                             {
+                                Intent intent=new Intent();
+                                setResult(1,intent);
                                 finish();
-                                SignUp_Activity.mobile.setText(getIntent().getStringExtra("mobile"));
-CustomerMobileActivity.customerMobileActivity.finish();
                             }
                             else
                             {

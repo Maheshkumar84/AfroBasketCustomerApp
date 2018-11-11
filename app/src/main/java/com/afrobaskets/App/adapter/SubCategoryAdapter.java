@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import com.afrobaskets.App.activity.ProductDetailActivity;
 import com.afrobaskets.App.bean.SubCategoriesAdapterbean;
 import com.afrobaskets.App.constant.Constants;
@@ -22,10 +23,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.webistrasoft.org.ecommerce.R;
+
 import org.json.JSONObject;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.Bind;
 
 /**
@@ -55,6 +59,9 @@ Context context;
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+        viewHolder.btn_linear1.setVisibility(View.GONE);
+        viewHolder.button_add.setVisibility(View.VISIBLE);
+
         viewHolder.price.setText("GHC "+subCategoriesAdapterbeanArrayList.get(position).
                 getSubCategoriesAdapterAttributesBeanArrayList().get(0).getPrice());
 
@@ -67,7 +74,6 @@ Context context;
         }
             viewHolder.name.setText(subCategoriesAdapterbeanArrayList.get(position).getProduct_name());
 
-        viewHolder.item_count.setText("0");
 
         url=subCategoriesAdapterbeanArrayList.get(position).getImage_root_path()+"/"+subCategoriesAdapterbeanArrayList.get(position).getImage_id()+"/"+subCategoriesAdapterbeanArrayList.get(position).getImage_name();
         Glide.with(context).load(subCategoriesAdapterbeanArrayList.get(position).getImage_root_path()+"/"+subCategoriesAdapterbeanArrayList.get(position).getImage_id()+"/"+subCategoriesAdapterbeanArrayList.get(position).getImage_name())
@@ -76,11 +82,22 @@ Context context;
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(viewHolder.product_image);
         setVarients(viewHolder.item_spinner,position);
-        viewHolder.item_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
+        viewHolder.item_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1,
                                        int arg2, long arg3) {
+                viewHolder.btn_linear1.setVisibility(View.GONE);
+                viewHolder.button_add.setVisibility(View.VISIBLE);
+                 for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+
+                    if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getMerchant_inventry_id())) {
+                        viewHolder.item_count.setText(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                        viewHolder.btn_linear1.setVisibility(View.VISIBLE);
+                        viewHolder.button_add.setVisibility(View.GONE);
+                    }
+
+                     }
                 // TODO Auto-generated method stub
                 viewHolder.price.setText("GHC "+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getPrice());
             }
@@ -93,24 +110,48 @@ Context context;
         viewHolder.button_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-viewHolder.btn_linear1.setVisibility(View.VISIBLE);
+            viewHolder.btn_linear1.setVisibility(View.VISIBLE);
                 viewHolder.button_add.setVisibility(View.GONE);
-                int count = Integer.parseInt(viewHolder.item_count.getText().toString());
-                if(count<0)
-                {
-                    return;
-                }
-                Constants.updateCart(context,"add",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId() ,subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
-                viewHolder.item_count.setText(""+(Integer.parseInt(viewHolder.item_count.getText().toString())+1));
+                 viewHolder.item_count.setText("1");
+                Constants.updateCart(context,"add",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId() ,subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
             }
         });
 
-
+        viewHolder.button_plus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count=0;
+                for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                      if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                       count=Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                          }
+                }
+               Constants.updateCart(context,"add",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId() ,subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
+                viewHolder.item_count.setText(""+(count+1));
+            }
+        });
+        viewHolder.button_minus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count=0;
+                for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+                    if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+                        count=Integer.parseInt(Constants.cartListBeenArray.get(i).getNumber_of_item());
+                    }
+                }
+                if(count<=1)
+                {  viewHolder.btn_linear1.setVisibility(View.GONE);
+                    viewHolder.button_add.setVisibility(View.VISIBLE);
+                }
+                Constants.updateCart(context,"delete",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(viewHolder.item_spinner.getSelectedItemPosition()).getId(),subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
+                viewHolder.item_count.setText(""+(count-1));
+            }
+        });
         viewHolder.product_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context,ProductDetailActivity.class);
-                  Gson gson = new Gson();
+                Gson gson = new Gson();
                 Type type = new TypeToken<List<SubCategoriesAdapterbean>>() {}.getType();
                 String json = gson.toJson(subCategoriesAdapterbeanArrayList, type);
                 intent.putExtra("data",json);
@@ -119,50 +160,18 @@ viewHolder.btn_linear1.setVisibility(View.VISIBLE);
                 context.startActivity(intent);
             }
         });
-
-        viewHolder.button_plus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int count = Integer.parseInt(viewHolder.item_count.getText().toString());
-                if(count<0)
-                {
-                    return;
-                }
-               Constants.updateCart(context,"add",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId() ,subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
-                viewHolder.item_count.setText(""+(Integer.parseInt(viewHolder.item_count.getText().toString())+1));
-            }
-        });
-        viewHolder.button_minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int count = Integer.parseInt(viewHolder.item_count.getText().toString());
-                if(count<=1)
-                {  viewHolder.btn_linear1.setVisibility(View.GONE);
-                    viewHolder.button_add.setVisibility(View.VISIBLE);
-
-                }
-                if(count<=0)
-                {
-                     return;
-                }
-                Constants.updateCart(context,"delete",subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId(),subCategoriesAdapterbeanArrayList.get(position).getProduct_name()+"("+subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getAttribute_name()+")");
-
-                viewHolder.item_count.setText(""+(Integer.parseInt(viewHolder.item_count.getText().toString())-1));
-            }
-        });
 try {
-    viewHolder.btn_linear1.setVisibility(View.GONE);
-    viewHolder.button_add.setVisibility(View.VISIBLE);
+    /*viewHolder.btn_linear1.setVisibility(View.GONE);
+    viewHolder.button_add.setVisibility(View.VISIBLE);*/
 
-    for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
-        if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getCartListProductDetailsBeanArrayList().get(0).getId())) {
+    /*for (int i = 0; i < Constants.cartListBeenArray.size(); i++) {
+        if (subCategoriesAdapterbeanArrayList.get(position).getSubCategoriesAdapterAttributesBeanArrayList().get(0).getId().equalsIgnoreCase(Constants.cartListBeenArray.get(i).getMerchant_inventry_id())) {
             viewHolder.item_count.setText(Constants.cartListBeenArray.get(i).getNumber_of_item());
             viewHolder.btn_linear1.setVisibility(View.VISIBLE);
             viewHolder.button_add.setVisibility(View.GONE);
+            break;
         }
-
-
-    }
+    }*/
 }catch (Exception e)
 {
     e.printStackTrace();

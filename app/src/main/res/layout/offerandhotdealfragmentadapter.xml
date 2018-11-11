@@ -106,6 +106,7 @@ android:background="@color/bg_grey"
             android:layout_below="@+id/linearLayout"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp"
+            android:visibility="gone"
             android:textColor="@color/colorPrimaryDark"
             android:id="@+id/txt_offers"
             />
@@ -154,7 +155,7 @@ android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Rs 350"
-
+android:visibility="gone"
                 android:textSize="12sp"
                android:layout_marginLeft="15dp"
                 />
